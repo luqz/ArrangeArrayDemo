@@ -29,7 +29,7 @@ func arrangeArray(array: [Int]) -> [[Int]]{
         }
     }
     
-    var hashTable = [String : Set<String>]()    //利用字典和Set实现双散列查找
+//    var hashTable = [String : Set<String>]()    //利用字典和Set实现双散列查找
     var hashSet = Set<String>()                 //利用Set实现单散列查找
 
     
@@ -47,12 +47,12 @@ func arrangeArray(array: [Int]) -> [[Int]]{
                 var newArray = oneArray
                 newArray.insert(oneElement, at: i)
 
-                //双散列去重后添加到finalArray中
-                if hasRepeatNumber {
-                    addNewArrayFilterByDict(hashTable: &hashTable, newArray: &newArray, finalArray: &finalArray)
-                } else {
-                    finalArray.append(newArray)
-                }
+//                //双散列去重后添加到finalArray中
+//                if hasRepeatNumber {
+//                    addNewArrayFilterByDict(hashTable: &hashTable, newArray: &newArray, finalArray: &finalArray)
+//                } else {
+//                    finalArray.append(newArray)
+//                }
 
                 //单散列去重后添加到finalArray中
                 if hasRepeatNumber {
@@ -124,6 +124,8 @@ private func addNewArrayFilterBySet(hashSet: inout Set<String>, newArray: inout 
     }
 }
 
+
+//测试
 let array1 = [1, 2, 1, 2, 10, 2, 3, 2, 3, 10, 1, 1, 2, 1]       //双散列查找去重需68s，单散列查找去重需74s
 let array2 = [1, 2, 1, 2, 1,  2, 3, 2, 3, 4,  1, 1, 2, 1]       //双散列查找去重需21s，单散列查找去重需27s
 
