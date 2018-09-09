@@ -49,17 +49,17 @@ func arrangeArray(array: [Int]) -> [[Int]]{
 
                 //双散列去重后添加到finalArray中
                 if hasRepeatNumber {
-                    removeRepeatNumberByDict(hashTable: &hashTable, newArray: &newArray, finalArray: &finalArray)
+                    addNewArrayFilterByDict(hashTable: &hashTable, newArray: &newArray, finalArray: &finalArray)
                 } else {
                     finalArray.append(newArray)
                 }
 
-//                //单散列去重后添加到finalArray中
-//                if hasRepeatNumber {
-//                    removeRepeatNumberBySet(hashSet: &hashSet, newArray: &newArray, finalArray: &finalArray)
-//                } else {
-//                    finalArray.append(newArray)
-//                }
+                //单散列去重后添加到finalArray中
+                if hasRepeatNumber {
+                    addNewArrayFilterBySet(hashSet: &hashSet, newArray: &newArray, finalArray: &finalArray)
+                } else {
+                    finalArray.append(newArray)
+                }
 
             }
         }
@@ -68,7 +68,7 @@ func arrangeArray(array: [Int]) -> [[Int]]{
     return finalArray
 }
 
-private func removeRepeatNumberByDict(hashTable: inout [String : Set<String>], newArray: inout [Int], finalArray: inout [[Int]] ) -> Void {
+private func addNewArrayFilterByDict(hashTable: inout [String : Set<String>], newArray: inout [Int], finalArray: inout [[Int]] ) -> Void {
     var hashKey1 = String()
     var hashKey2 = String()
     for j in 0 ..< newArray.count {
@@ -105,7 +105,7 @@ private func removeRepeatNumberByDict(hashTable: inout [String : Set<String>], n
 
 }
 
-private func removeRepeatNumberBySet(hashSet: inout Set<String>, newArray: inout [Int], finalArray: inout [[Int]] ) -> Void {
+private func addNewArrayFilterBySet(hashSet: inout Set<String>, newArray: inout [Int], finalArray: inout [[Int]] ) -> Void {
     var hashKey = String()
     for element in newArray {
         if element > 9 {                                    //此判断对性能无明显影响
