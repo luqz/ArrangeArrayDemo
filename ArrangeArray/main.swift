@@ -9,15 +9,14 @@
 import Foundation
 
 func arrangeArray(array: [Int]) -> [[Int]]{
-    var finalArray: [[Int]] = [[Int]]()
-    
     //元素个数为0时返回空数组
     if array.count == 0 {
         return [[Int]]()
     }
-
-    var hasRepeatNumber = false
-
+    
+    //初始化
+    var finalArray: [[Int]] = [[Int]]()
+    var hasRepeatNumber = false                 //是否需要去重
     for i in 0 ..< array.count {
         for j in i+1 ..< array.count {
             if array[i] == array[j] {
@@ -29,20 +28,15 @@ func arrangeArray(array: [Int]) -> [[Int]]{
             break
         }
     }
+    
+    var hashTable = [String : Set<String>]()    //利用字典和Set实现双散列查找
+    var hashSet = Set<String>()                 //利用Set实现单散列查找
 
-    //利用字典和Set实现双散列查找
-//    var hashTable = [String : Set<String>]()
-
-    //利用Set实现单散列查找
-    var hashSet = Set<String>()
-
+    
+    //排列组合
     var tempArray = array
-
-    //取出一个元素
-    let oneElement = tempArray.removeFirst()
-
-    //剩余元素排列组合
-    let returnedArray = arrangeArray(array: tempArray)
+    let oneElement = tempArray.removeFirst()                //取出一个元素
+    let returnedArray = arrangeArray(array: tempArray)     //剩余元素排列组合
 
     //将取出的元素插入到递归返回的数组中的每一个数组中的每一个位置，并添加到递归函数要返回的数组中
     if returnedArray.count == 0 {
@@ -53,67 +47,19 @@ func arrangeArray(array: [Int]) -> [[Int]]{
                 var newArray = oneArray
                 newArray.insert(oneElement, at: i)
 
-//                //双散列去重
-//                if hasRepeatNumber {
-//                    var hashKey1 = String()
-//                    var hashKey2 = String()
-//                    for j in 0 ..< newArray.count {
-//                        if j % 2 == 0 {
-//                            if newArray[j] > 9 {                                //此判断对性能无明显影响
-//                                hashKey1 += " " + String(newArray[j]) + " "     //两个相邻的非个位数相邻时多添加了一个空格，若增加一个末尾是否是空格的判断，在非个位数占比较少时明显增加运算时间
-//                            } else {
-//                                hashKey1 += String(newArray[j])
-//                            }
-//                        } else {
-//                            if newArray[j] > 9 {
-//                                hashKey2 += " " + String(newArray[j]) + " "
-//                            } else {
-//                                hashKey2 += String(newArray[j])
-//                            }
-//                        }
-//                    }
-//
-//                    if let set = hashTable[hashKey1] {
-//                        //已经有内部哈希表进行查找
-//                        if set.contains(hashKey2) {
-//                            //重复，丢弃
-//
-//                        } else {
-//                            finalArray.append(newArray)
-//                            hashTable[hashKey1]?.insert(hashKey2)
-//                        }
-//                    } else {
-//                        //无内部哈希表时添加内部哈希表，注意字典为值类型
-//                        finalArray.append(newArray)
-//                        hashTable[hashKey1] = Set<String>()
-//                        hashTable[hashKey1]?.insert(hashKey2)
-//                    }
-//                } else {
-//                    //不去重
-//                    finalArray.append(newArray)
-//                }
-
-                //单散列去重
+                //双散列去重后添加到finalArray中
                 if hasRepeatNumber {
-                    var hashKey = String()
-                    for element in newArray {
-                        if element > 9 {                                    //此判断对性能无明显影响
-                            hashKey += " " + String(element) + " "          //两个相邻的非个位数相邻时多添加了一个空格，若增加一个末尾是否是空格的判断，在非个位数占比较少时明显增加运算时间
-                        } else {
-                            hashKey += String(element)
-                        }
-                    }
-
-                    if hashSet.contains(hashKey) {
-                        //重复，丢弃
-                        
-                    } else {
-                        finalArray.append(newArray)
-                        hashSet.insert(hashKey)
-                    }
+                    removeRepeatNumberByDict(hashTable: &hashTable, newArray: &newArray, finalArray: &finalArray)
                 } else {
                     finalArray.append(newArray)
                 }
+
+//                //单散列去重后添加到finalArray中
+//                if hasRepeatNumber {
+//                    removeRepeatNumberBySet(hashSet: &hashSet, newArray: &newArray, finalArray: &finalArray)
+//                } else {
+//                    finalArray.append(newArray)
+//                }
 
             }
         }
@@ -122,7 +68,61 @@ func arrangeArray(array: [Int]) -> [[Int]]{
     return finalArray
 }
 
+private func removeRepeatNumberByDict(hashTable: inout [String : Set<String>], newArray: inout [Int], finalArray: inout [[Int]] ) -> Void {
+    var hashKey1 = String()
+    var hashKey2 = String()
+    for j in 0 ..< newArray.count {
+        if j % 2 == 0 {
+            if newArray[j] > 9 {                                //此判断对性能无明显影响
+                hashKey1 += " " + String(newArray[j]) + " "     //两个相邻的非个位数相邻时多添加了一个空格，若增加一个末尾是否是空格的判断，在非个位数占比较少时明显增加运算时间
+            } else {
+                hashKey1 += String(newArray[j])
+            }
+        } else {
+            if newArray[j] > 9 {
+                hashKey2 += " " + String(newArray[j]) + " "
+            } else {
+                hashKey2 += String(newArray[j])
+            }
+        }
+    }
+    
+    if let set = hashTable[hashKey1] {
+        //已经有内部哈希表进行查找
+        if set.contains(hashKey2) {
+            //重复，丢弃
+            
+        } else {
+            finalArray.append(newArray)
+            hashTable[hashKey1]?.insert(hashKey2)
+        }
+    } else {
+        //无内部哈希表时添加内部哈希表，注意字典为值类型
+        finalArray.append(newArray)
+        hashTable[hashKey1] = Set<String>()
+        hashTable[hashKey1]?.insert(hashKey2)
+    }
 
+}
+
+private func removeRepeatNumberBySet(hashSet: inout Set<String>, newArray: inout [Int], finalArray: inout [[Int]] ) -> Void {
+    var hashKey = String()
+    for element in newArray {
+        if element > 9 {                                    //此判断对性能无明显影响
+            hashKey += " " + String(element) + " "          //两个相邻的非个位数相邻时多添加了一个空格，若增加一个末尾是否是空格的判断，在非个位数占比较少时明显增加运算时间
+        } else {
+            hashKey += String(element)
+        }
+    }
+    
+    if hashSet.contains(hashKey) {
+        //重复，丢弃
+        
+    } else {
+        finalArray.append(newArray)
+        hashSet.insert(hashKey)
+    }
+}
 
 let array1 = [1, 2, 1, 2, 10, 2, 3, 2, 3, 10, 1, 1, 2, 1]       //双散列查找去重需68s，单散列查找去重需74s
 let array2 = [1, 2, 1, 2, 1,  2, 3, 2, 3, 4,  1, 1, 2, 1]       //双散列查找去重需21s，单散列查找去重需27s
